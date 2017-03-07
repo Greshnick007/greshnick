@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Мама</title>
+<meta charset="utf8">
+</head>
+<body>
+<canvas id="canvas"></canvas>
+</body>
+<script>
+getBezierBasis = (i, n, t) => {f = (n) => { return (n <= 1)  ?  1 : n * f(n - 1)}; return (f(n)/(f(i)*f(n - i)))* Math.pow(t, i)*Math.pow(1 - t, n - i);}
+
+/*function getBezierBasis(i, n, t) {
+	// Факториал
+	function f(n) {
+		return (n <= 1) ? 1 : n * f(n - 1);
+	};
+	
+	// считаем i-й элемент полинома Берштейна
+	return (f(n)/(f(i)*f(n - i)))* Math.pow(t, i)*Math.pow(1 - t, n - i);
+}*/
+
+function getBezierCurve(arr, step) {
+	if (step == undefined) {
+		step = 0.01;
+	}
+	
+	var res = new Array()
+	
+	for (var t = 0; t < 1 + step; t += step) {
+		if (t > 1) {
+			t = 1;
+		}
+		
+		var ind = res.length;
+		
+		res[ind] = new Array(0, 0);
+		
+		
+		for (let i = 0; i < arr.length; i++) {
+			var b = getBezierBasis(i, arr.length - 1, t);
+		
+			res[ind][0] += arr[i][0] * b;
+			res[ind][1] += arr[i][1] * b;
+		}
+		
+	}
+	
+	return res;
+}
+
+function drawLines(ctx, arr, delay, pause) {
+	if (delay == undefined) {
+		delay = 10;
+	}
+	
+	if (pause == undefined) {
+		pause = delay;
+	}
+	var i = 0;
+	
+	function delayDraw() {
+		if (i >= arr.length - 1) {
+			return;
+		}
+		
+		ctx.moveTo(arr[i][0],arr[i][1]);
+		ctx.lineTo(arr[i+1][0],arr[i+1][1]);
+		ctx.stroke();
+	
+		++i;
+		
+		setTimeout(delayDraw, delay);
+	}
+	
+	setTimeout(delayDraw, pause);
+}
+
+
+drawC = document.getElementById('canvas');
+drawC.width = 1360;
+drawC.height = 700;
+		
+if (drawC && drawC.getContext) {
+	ctx = drawC.getContext('2d');
+	ctx.strokeStyle="#000";
+	ctx.strokeStyle="#FF00AE";
+	ctx.lineWidth=5;
+	
+	
+	let flow; // Массив координат кривой*/
+	let arr = new Array();
+	arr[0] = new Array(105,385);
+	let a=105, b=385;
+	let points = [0,133,156,30,133,-201,-1,-6,-50,191,33,181,78,-128,22,-337,15,-54,-4,134,123,-187,142,-48,4,21,-4,-112,-53,10,-20,51,46,111,63,-38,-31,21,25,180,58,-41,-14,16,-14,206,39,-14,4,-15,-41,151,36,41,78,-111,105,-10,65,-50,-68,-66,-75,242,1,-2,18,-59,-60,102,58,55];
+	for (let i=0; i<(points.length/2); i++) {
+	let x, y;
+	if ((i+1) % 3 == 0) {a = a+points[i*2]; b = b+points[i*2+1]; x = a; y = b;}
+	else
+	{
+	//Еще немного и я освою египетский язык)))
+	x = a+points[i*2];
+	y = b+points[i*2+1];
+	}
+	arr[i+1] = new Array(x, y);
+	}
+	ctx.beginPath();
+	//document.write(arr+"<br/>");
+	let draw_arr = new Array();
+	let j = 0;
+	for (let i=0; i<arr.length; i++)
+	{
+	draw_arr[j] =	arr[i]; j++;
+	if (draw_arr.length % 4 == 0) {
+	//document.write(draw_arr+"<br/>");
+	flow = getBezierCurve(draw_arr, 0.01);
+	drawLines(ctx, flow, 10);
+	draw_arr = [];
+	draw_arr[0] = arr[i];
+	j = 1;
+	}
+	}
+	}
+	//var p = new Path2D("M50 470c59,-7 118,-14 142,-44 24,-31 14,-86 28,-133 15,-47 54,-86 109,-92 55,-6 126,22 175,10 50,-11 78,-60 116,-75 37,-16 84,4 130,23");
+	//ctx.stroke(p);
+	
+</script>
+</html>
